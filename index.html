@@ -98,9 +98,17 @@
                   <p class="panel-kicker">Planilha original</p>
                   <h2>Conferência completa</h2>
                 </div>
-                <p id="original-caption" class="table-note">
-                  A visualização mantém o conteúdo da aba selecionada.
-                </p>
+                <div class="original-toolbar">
+                  <p id="original-caption" class="table-note">
+                    A visualização mantém o conteúdo da aba selecionada.
+                  </p>
+                  <div class="zoom-controls" aria-label="Controles de zoom da planilha original">
+                    <button id="zoom-out-button" class="button button-inline" type="button">-</button>
+                    <span id="zoom-level" class="zoom-level">100%</span>
+                    <button id="zoom-reset-button" class="button button-inline" type="button">100%</button>
+                    <button id="zoom-in-button" class="button button-inline" type="button">+</button>
+                  </div>
+                </div>
               </div>
 
               <div class="table-scroll original-scroll">

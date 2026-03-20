@@ -60,6 +60,7 @@
     areas: [],
     selectedDate: "",
     selectedAreas: new Set(),
+    originalZoom: 1,
     highlightTimer: null,
     highlightedRowNumber: null,
   };
@@ -80,10 +81,15 @@
     simplifiedTable: document.getElementById("simplified-table"),
     originalTable: document.getElementById("original-table"),
     originalCaption: document.getElementById("original-caption"),
+    zoomOutButton: document.getElementById("zoom-out-button"),
+    zoomInButton: document.getElementById("zoom-in-button"),
+    zoomResetButton: document.getElementById("zoom-reset-button"),
+    zoomLevel: document.getElementById("zoom-level"),
   };
 
   bindEvents();
   renderEmptyTables();
+  applyOriginalZoom();
 
   function bindEvents() {
     elements.fileInput.addEventListener("change", function (event) {
@@ -155,6 +161,18 @@
       state.selectedAreas = new Set();
       renderAreaFilters();
       renderFilteredView();
+    });
+
+    elements.zoomOutButton.addEventListener("click", function () {
+      setOriginalZoom(state.originalZoom - 0.1);
+    });
+
+    elements.zoomInButton.addEventListener("click", function () {
+      setOriginalZoom(state.originalZoom + 0.1);
+    });
+
+    elements.zoomResetButton.addEventListener("click", function () {
+      setOriginalZoom(1);
     });
 
     elements.simplifiedTable.addEventListener("click", function (event) {
@@ -607,6 +625,22 @@
       '<p class="original-placeholder">Depois do upload, a planilha original aparece aqui para conferência.</p>';
   }
 
+  function setOriginalZoom(nextZoom) {
+    const clampedZoom = Math.min(1.6, Math.max(0.5, Number(nextZoom.toFixed(2))));
+    state.originalZoom = clampedZoom;
+    applyOriginalZoom();
+  }
+
+  function applyOriginalZoom() {
+    const zoom = state.originalZoom;
+    elements.originalTable.style.setProperty("--sheet-font-size", 11 * zoom + "px");
+    elements.originalTable.style.setProperty("--sheet-cell-width", 120 * zoom + "px");
+    elements.originalTable.style.setProperty("--sheet-cell-padding-y", Math.max(2, 4 * zoom) + "px");
+    elements.originalTable.style.setProperty("--sheet-cell-padding-x", Math.max(3, 6 * zoom) + "px");
+    elements.originalTable.style.setProperty("--sheet-row-header-width", Math.max(30, 44 * zoom) + "px");
+    elements.zoomLevel.textContent = Math.round(zoom * 100) + "%";
+  }
+
   function resetWorkspace() {
     state.fileName = "";
     state.title = "";
@@ -690,6 +724,10 @@
       return "";
     }
 
+    if (shouldHideOriginalCellDisplay(rowNumber, columnIndex, normalized)) {
+      return "";
+    }
+
     if (!shouldFormatOriginalCellAsDate(rowNumber, columnIndex, normalized)) {
       return normalized;
     }
@@ -709,6 +747,10 @@
     const isHeaderDateBand = rowNumber === state.headerRowNumber && columnIndex >= 13;
 
     return isMainDateColumn || isHeaderDateBand;
+  }
+
+  function shouldHideOriginalCellDisplay(rowNumber, columnIndex, value) {
+    return rowNumber === 1 && columnIndex === 2 && /programação semanal manutenção triunfo/i.test(value);
   }
 
   function columnNumberToName(index) {

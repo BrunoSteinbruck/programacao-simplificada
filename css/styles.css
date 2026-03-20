@@ -14,7 +14,7 @@
   --radius-lg: 0;
   --radius-md: 0;
   --radius-sm: 0;
-  --container: min(1120px, calc(100vw - 32px));
+  --container: min(1360px, calc(100vw - 16px));
 }
 
 * {
