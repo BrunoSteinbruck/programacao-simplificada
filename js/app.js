@@ -53,7 +53,6 @@
     title: "",
     sheetName: SOURCE_SHEET,
     headerRowNumber: 3,
-    originalSheetHtml: "",
     originalRows: [],
     headers: HEADER_FALLBACK,
     activities: [],
@@ -216,7 +215,6 @@
       state.title = parsed.title;
       state.sheetName = parsed.sheetName;
       state.headerRowNumber = parsed.headerRowNumber;
-      state.originalSheetHtml = parsed.originalSheetHtml;
       state.originalRows = parsed.originalRows;
       state.headers = parsed.headers;
       state.activities = parsed.activities;
@@ -318,7 +316,6 @@
       title: extractTitle(originalRows),
       sheetName: sheetName,
       headerRowNumber: headerRowNumber,
-      originalSheetHtml: buildOriginalSheetHtml(sheet),
       headers: fillCells(headerRow.cells, HEADER_FALLBACK.length),
       originalRows: originalRows,
       activities: activities,
@@ -466,7 +463,63 @@
   }
 
   function renderOriginalTable() {
-    elements.originalTable.innerHTML = state.originalSheetHtml;
+    const columnCount = getOriginalColumnCount();
+
+    if (!columnCount || !state.originalRows.length) {
+      elements.originalTable.innerHTML =
+        '<p class="original-placeholder">Depois do upload, a planilha original aparece aqui para conferência.</p>';
+      return;
+    }
+
+    const headerCells = Array.from({ length: columnCount }, function (_, index) {
+      return '<th class="sheet-column-header" scope="col">' + escapeHtml(columnNumberToName(index)) + "</th>";
+    }).join("");
+
+    const bodyRows = state.originalRows
+      .map(function (row) {
+        const rowClasses = [];
+
+        if (isRowEmpty(row.cells)) {
+          rowClasses.push("sheet-row-empty");
+        }
+
+        if (row.rowNumber === state.headerRowNumber) {
+          rowClasses.push("sheet-header-row");
+        }
+
+        const cellsHtml = row.cells
+          .map(function (cell, index) {
+            const displayValue = formatOriginalCellDisplay(row.rowNumber, index, cell);
+            return '<td class="sheet-cell">' + (displayValue ? escapeHtml(displayValue) : "&nbsp;") + "</td>";
+          })
+          .join("");
+
+        return (
+          '<tr id="original-row-' +
+          String(row.rowNumber) +
+          '" class="' +
+          rowClasses.join(" ") +
+          '">' +
+          '<th class="sheet-row-number" scope="row">' +
+          String(row.rowNumber) +
+          "</th>" +
+          cellsHtml +
+          "</tr>"
+        );
+      })
+      .join("");
+
+    elements.originalTable.innerHTML =
+      '<table class="excel-table">' +
+      "<thead>" +
+      '<tr><th class="sheet-corner" aria-hidden="true"></th>' +
+      headerCells +
+      "</tr>" +
+      "</thead>" +
+      "<tbody>" +
+      bodyRows +
+      "</tbody>" +
+      "</table>";
   }
 
   function getFilteredActivities() {
@@ -525,10 +578,13 @@
       }
     }
 
+    row.classList.remove("is-highlighted");
+    void row.offsetWidth;
     row.classList.add("is-highlighted");
     row.scrollIntoView({
       behavior: "smooth",
       block: "center",
+      inline: "nearest",
     });
 
     state.highlightedRowNumber = rowNumber;
@@ -556,7 +612,6 @@
     state.title = "";
     state.sheetName = SOURCE_SHEET;
     state.headerRowNumber = 3;
-    state.originalSheetHtml = "";
     state.originalRows = [];
     state.headers = HEADER_FALLBACK;
     state.activities = [];
@@ -597,30 +652,6 @@
       type === "success" ? "var(--success)" : type === "error" ? "var(--danger)" : "var(--text)";
   }
 
-  function buildOriginalSheetHtml(sheet) {
-    const wrapper = document.createElement("div");
-    wrapper.innerHTML = window.XLSX.utils.sheet_to_html(sheet, {
-      editable: false,
-      header: "",
-      footer: "",
-    });
-
-    const table = wrapper.querySelector("table");
-
-    if (!table) {
-      return '<p class="original-placeholder">Nao foi possivel renderizar a planilha original.</p>';
-    }
-
-    table.removeAttribute("id");
-    table.className = "raw-sheet-table";
-
-    Array.from(table.querySelectorAll("tr")).forEach(function (row, index) {
-      row.id = "original-row-" + String(index + 1);
-    });
-
-    return wrapper.innerHTML;
-  }
-
   function trimTrailingEmptyRows(rows) {
     const output = rows.slice();
 
@@ -644,6 +675,53 @@
     }
 
     return safeRow;
+  }
+
+  function getOriginalColumnCount() {
+    return state.originalRows.reduce(function (max, row) {
+      return Math.max(max, row.cells.length);
+    }, 0);
+  }
+
+  function formatOriginalCellDisplay(rowNumber, columnIndex, value) {
+    const normalized = normalizeDisplayValue(value);
+
+    if (!normalized) {
+      return "";
+    }
+
+    if (!shouldFormatOriginalCellAsDate(rowNumber, columnIndex, normalized)) {
+      return normalized;
+    }
+
+    const parsed = parseDateValue(normalized);
+    return parsed.label || normalized;
+  }
+
+  function shouldFormatOriginalCellAsDate(rowNumber, columnIndex, value) {
+    const numericValue = Number(value);
+
+    if (!Number.isFinite(numericValue)) {
+      return false;
+    }
+
+    const isMainDateColumn = columnIndex === COLUMN_INDEX.date && rowNumber > state.headerRowNumber;
+    const isHeaderDateBand = rowNumber === state.headerRowNumber && columnIndex >= 13;
+
+    return isMainDateColumn || isHeaderDateBand;
+  }
+
+  function columnNumberToName(index) {
+    let output = "";
+    let current = index + 1;
+
+    while (current > 0) {
+      const remainder = (current - 1) % 26;
+      output = String.fromCharCode(65 + remainder) + output;
+      current = Math.floor((current - 1) / 26);
+    }
+
+    return output;
   }
 
   function findHeaderRowNumber(rows) {

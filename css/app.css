@@ -246,18 +246,88 @@
 }
 
 .original-table {
-  padding: 8px;
+  padding: 0;
 }
 
 .original-table table {
-  width: auto;
   min-width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-family: Calibri, Arial, sans-serif;
+  font-size: 11px;
+  color: #000000;
 }
 
 .original-placeholder {
   margin: 0;
   padding: 16px;
   color: var(--muted);
+}
+
+.excel-table th,
+.excel-table td {
+  padding: 4px 6px;
+  border: 1px solid #d9d9d9;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+  background: #ffffff;
+}
+
+.excel-table .sheet-corner,
+.excel-table .sheet-column-header,
+.excel-table .sheet-row-number {
+  color: #222222;
+  font-weight: 400;
+  text-align: center;
+  background: #f3f3f3;
+}
+
+.excel-table .sheet-corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  min-width: 44px;
+}
+
+.excel-table .sheet-column-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.excel-table .sheet-row-number {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 44px;
+}
+
+.excel-table .sheet-cell {
+  min-width: 120px;
+}
+
+.excel-table tbody tr:nth-child(odd) .sheet-cell,
+.excel-table tbody tr:nth-child(odd) .sheet-row-number {
+  background: #eaf3ff;
+}
+
+.excel-table tbody tr:nth-child(even) .sheet-cell,
+.excel-table tbody tr:nth-child(even) .sheet-row-number {
+  background: #edf8ea;
+}
+
+.excel-table .sheet-row-empty .sheet-cell {
+  background: #ffffff;
+}
+
+.excel-table .sheet-header-row .sheet-cell,
+.excel-table .sheet-header-row .sheet-row-number {
+  color: #ffffff;
+  font-weight: 700;
+  background: #1f497d;
+  border-color: #17365d;
 }
 
 .data-table {
@@ -314,7 +384,23 @@
 
 .original-table .is-highlighted td,
 .original-table .is-highlighted th {
-  background: #fff4a8;
+  background: #ffd966 !important;
+  box-shadow: inset 0 0 0 2px #c98900;
+  animation: row-flash 900ms ease-in-out 2;
+}
+
+@keyframes row-flash {
+  0% {
+    background: #fff6bf;
+  }
+
+  50% {
+    background: #ffcc33;
+  }
+
+  100% {
+    background: #ffd966;
+  }
 }
 
 .loading-state {
