@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Programação Semanal Simplificada</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="./css/app.css" />
+  </head>
+  <body class="page-shell single-page">
+    <main class="app-page">
+      <div class="container app-layout">
+        <section id="title-panel" class="title-panel card">
+          <p class="eyebrow">Consulta da programação semanal</p>
+          <h1>Programação Semanal Simplificada</h1>
+          <p class="section-description">
+            Carregue a planilha da semana e filtre por data e áreas encontradas no arquivo.
+          </p>
+        </section>
+
+        <section id="intro-panel" class="intro-panel">
+          <div class="upload-panel card">
+            <div
+              id="upload-zone"
+              class="upload-zone"
+              role="button"
+              tabindex="0"
+              aria-controls="file-input"
+              aria-label="Selecionar planilha de programação semanal"
+            >
+              <input id="file-input" class="visually-hidden" type="file" accept=".xlsx,.xls" />
+              <p class="upload-title">Clique aqui para carregar a planilha</p>
+              <p class="upload-subtitle">Arquivo esperado: `.xlsx` com a aba `Visão_Dias`</p>
+              <span class="upload-badge">Leitura feita no navegador</span>
+            </div>
+
+            <div class="status-card">
+              <p class="status-label">Status do arquivo</p>
+              <p id="file-status" class="status-text">Nenhuma planilha carregada.</p>
+              <p id="file-summary" class="status-meta">
+                Depois do upload, os filtros e as tabelas aparecem abaixo.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="workspace" class="workspace hidden" aria-live="polite">
+          <div class="filters-panel card">
+            <div class="filters-header">
+              <div>
+                <p class="panel-kicker">Filtros</p>
+                <h2>Data e áreas da planilha</h2>
+              </div>
+              <p id="results-summary" class="results-summary">0 atividades</p>
+            </div>
+
+            <div class="filter-grid">
+              <label class="filter-block" for="date-filter">
+                <span class="filter-label">Data</span>
+                <select id="date-filter" class="filter-select"></select>
+              </label>
+
+              <div class="filter-block">
+                <div class="filter-headline">
+                  <span class="filter-label">Áreas encontradas na planilha</span>
+                  <div class="filter-buttons">
+                    <button id="select-all-areas" class="button button-inline" type="button">
+                      Marcar todas
+                    </button>
+                    <button id="clear-all-areas" class="button button-inline" type="button">
+                      Limpar
+                    </button>
+                  </div>
+                </div>
+                <div id="areas-filter" class="areas-grid"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="results-stack">
+            <article class="card table-card">
+              <div class="table-header">
+                <div>
+                  <p class="panel-kicker">Tabela filtrada</p>
+                  <h2>Atividades</h2>
+                </div>
+                <p class="table-note">Clique em uma linha para localizar a mesma linha na planilha original.</p>
+              </div>
+
+              <div class="table-scroll">
+                <table id="simplified-table" class="data-table simplified-table"></table>
+              </div>
+            </article>
+
+            <article class="card table-card">
+              <div class="table-header">
+                <div>
+                  <p class="panel-kicker">Planilha original</p>
+                  <h2>Conferência completa</h2>
+                </div>
+                <p id="original-caption" class="table-note">
+                  A visualização mantém o conteúdo da aba selecionada.
+                </p>
+              </div>
+
+              <div class="table-scroll original-scroll">
+                <div id="original-table" class="original-table"></div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="./js/app.js"></script>
+  </body>
+</html>
