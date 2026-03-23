@@ -357,6 +357,7 @@
       area: row.cells[COLUMN_INDEX.area],
       areaCode: areaCode,
       installation: row.cells[COLUMN_INDEX.installation],
+      sortField: row.cells[COLUMN_INDEX.sortField],
       workCenter: row.cells[COLUMN_INDEX.workCenter],
       description: row.cells[COLUMN_INDEX.description],
       order: row.cells[COLUMN_INDEX.order],
@@ -423,6 +424,7 @@
       "<th>Location</th>" +
       "<th>Área</th>" +
       "<th>Local de Instalação</th>" +
+      "<th>Campo de ordenação</th>" +
       "<th>Centro de Trabalho</th>" +
       "<th>Descrição da Ordem / Atividade</th>" +
       "</tr></thead>";
@@ -430,7 +432,7 @@
     if (!filteredActivities.length) {
       elements.simplifiedTable.innerHTML =
         headerHtml +
-        '<tbody><tr class="empty-row"><td colspan="5">Nenhuma atividade encontrada para a combinação atual de data e áreas.</td></tr></tbody>';
+        '<tbody><tr class="empty-row"><td colspan="6">Nenhuma atividade encontrada para a combinação atual de data e áreas.</td></tr></tbody>';
       return;
     }
 
@@ -453,6 +455,9 @@
               escapeHtml(activity.installation) +
               "</td>" +
               "<td>" +
+              escapeHtml(activity.sortField) +
+              "</td>" +
+              "<td>" +
               escapeHtml(activity.workCenter) +
               "</td>" +
               "<td>" +
@@ -465,7 +470,7 @@
 
         return (
           "<tbody>" +
-          '<tr class="group-row"><th colspan="5">' +
+          '<tr class="group-row"><th colspan="6">' +
           escapeHtml(group.areaCode) +
           '<span class="group-count">' +
           group.items.length +
@@ -618,8 +623,8 @@
 
   function renderEmptyTables() {
     elements.simplifiedTable.innerHTML =
-      "<thead><tr><th>Location</th><th>Área</th><th>Local de Instalação</th><th>Centro de Trabalho</th><th>Descrição da Ordem / Atividade</th></tr></thead>" +
-      '<tbody><tr class="empty-row"><td colspan="5">Envie uma planilha para gerar a leitura simplificada.</td></tr></tbody>';
+      "<thead><tr><th>Location</th><th>Área</th><th>Local de Instalação</th><th>Campo de ordenação</th><th>Centro de Trabalho</th><th>Descrição da Ordem / Atividade</th></tr></thead>" +
+      '<tbody><tr class="empty-row"><td colspan="6">Envie uma planilha para gerar a leitura simplificada.</td></tr></tbody>';
 
     elements.originalTable.innerHTML =
       '<p class="original-placeholder">Depois do upload, a planilha original aparece aqui para conferência.</p>';
