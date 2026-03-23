@@ -6,10 +6,12 @@ Todo domingo o time de operação recebe um Excel com as ordens da semana. O app
 Como usar
 
 Acesse o app pelo GitHub Pages
-Carregue o arquivo .xlsx da semana
-Filtre pelas áreas e data
 
 https://brunosteinbruck.github.io/programacao-simplificada/
+
+Carregue o arquivo excel da semana
+Filtre pelas áreas e data
+
 
 
 Tecnologias:
